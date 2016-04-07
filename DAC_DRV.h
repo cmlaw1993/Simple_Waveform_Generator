@@ -10,4 +10,10 @@
 
 #include "stm32f0xx.h"
 
+uint32_t DAC_read(void);
+void DAC_write(uint32_t data);
+void DAC_load_data_buffer(uint32_t data);
+void DAC_enable(void);
+void DAC_init(void);
+
 #endif /* DAC_DRV_H */

@@ -1,5 +1,5 @@
 
-/** @file DAC_DRV.c
+/** @file DAC_DRV.h
  *  @brief DAC Driver include file for the STM32F072RB.
  *  @author Dennis Law
  *  @date April 2016

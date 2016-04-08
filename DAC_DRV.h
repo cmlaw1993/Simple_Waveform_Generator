@@ -12,7 +12,6 @@
 
 int DAC_read(int chn, uint32_t *output);
 int DAC_write(int chn, uint32_t data);
-void DAC_load_data_buffer(uint32_t data);
 int DAC_enable(int chn);
 int DAC_init(int chn);
 

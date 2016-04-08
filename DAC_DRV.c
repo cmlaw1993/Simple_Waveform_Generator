@@ -8,6 +8,8 @@
 #include <assert.h>
 #include "DAC_DRV.h"
 
+
+
 /**	@brief Reads the output register of channel 1.
  *	@param chn The channel to read. The value is either 1 or 2.
  *	@param output The container for storing the value of DAC_DOR1
@@ -30,24 +32,39 @@ int DAC_read(int chn, uint32_t *output)
 /** @brief Writes an analog value to either channel 1 or 2.
  *	@param chn The channel to write data to. The value is either 1 or 2.
  *	@param data The data to be written to the data register.
+ *	@param res The resolution of the data to be written.
  *	@returns Returns 0 if successful and -1 if otherwise.
  *
- *	@details The user input value is written to the 12 bit right aligned
- *	register, DAC_DHR12R1. The output voltage is calculated using the
- *	formula below.
+ *	@details The user input value is written to either the 8 bit or 12 bit
+ *	right aligned registers depending on the value of res. The output
+ *	voltage is calculated using the formula below.
  *
  *		DAC(output) = V(DDA) * DOR / 4095
  */
-int DAC_write(int chn, uint32_t data)
+int DAC_writeSingle(int chn, uint32_t data, DAC_RESOLUTION res)
 {
 	if ((chn != 1) && (chn != 2))
 		return -1;
 	
-	if (chn == 1)
-		DAC->DHR12R1 = (data & 0x00000FFF);
-	else
-		DAC->DHR12R2 = (data & 0x00000FFF);
+	switch (res) {
+	case DAC_RESOLUTION_8:
+		if (chn == 1)
+			DAC->DHR8R1 = (data & DAC_RESOLUTION_8_MASK);
+		else
+			DAC->DHR8R2 = (data & DAC_RESOLUTION_8_MASK);
+		break;
 	
+	case DAC_RESOLUTION_12:
+		if (chn == 1)
+			DAC->DHR12R1 = (data & DAC_RESOLUTION_12_MASK);
+		else
+			DAC->DHR12R2 = (data & DAC_RESOLUTION_12_MASK);
+		break;
+		
+	default:
+		return -1;
+	}
+
 	return 0;
 }
 

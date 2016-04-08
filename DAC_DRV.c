@@ -8,8 +8,6 @@
 #include <assert.h>
 #include "DAC_DRV.h"
 
-
-
 /**	@brief Reads the output register of channel 1.
  *	@param chn The channel to read. The value is either 1 or 2.
  *	@param output The container for storing the value of DAC_DOR1
@@ -101,16 +99,14 @@ int DAC_init(int chn)
 	/* Enable clock for DAC peripheral */
 	RCC->APB1ENR |= RCC_APB1ENR_DACEN;
 	
-	if (chn == 1)
-	{
+	if (chn == 1) {
 		GPIOA->MODER |= GPIO_MODER_MODER4; 		/* Set pin as AIN */
 		GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR4); 	/* Disable pull resistor */
 		
 		DAC->CR &= ~(DAC_CR_TEN1); 	/* Disable triggering */
 		DAC->CR |= DAC_CR_BOFF1; 	/* Enable output buffer */
 	}
-	else if (chn == 2)
-	{
+	else if (chn == 2) {
 		GPIOA->MODER |= GPIO_MODER_MODER5; 		/* Set pin as AIN */
 		GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR5); 	/* Disable pull resistor */
 		

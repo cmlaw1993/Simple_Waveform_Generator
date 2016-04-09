@@ -8,23 +8,33 @@
 #include <assert.h>
 #include "DAC_DRV.h"
 
-/**	@brief Reads the output register of channel 1.
+/**	@brief Reads the output register of a single channel.
  *	@param chn The channel to read. The value is either 1 or 2.
  *	@param output The container for storing the value of DAC_DOR1
  *	register.
  *	@returns Returns 0 if successful and -1 if otherwise.
  */
-int DAC_read(int chn, uint32_t *output)
+int DAC_readSingle(int chn, uint32_t *output)
 {
 	if ((chn != 1) && (chn != 2))
 		return -1;
-	
+
 	if (chn == 1)
 		*output = (DAC->DOR1 & 0x00000FFF);
 	else
 		*output = (DAC->DOR2 & 0x00000FFF);
-	
+
 	return 0;
+}
+
+/** @brief Reads the output registers of both DAC channels.
+ *	@param output1 The container for storing the value of DAC_DOR1.
+ *	@param output2 The container for storing the value of DAC_DOR2.
+ */
+void DAC_readDual(uint32_t *output1, uint32_t *output2)
+{
+	*output1 = (DAC->DOR1 & 0x00000FFF);
+	*output2 = (DAC->DOR2 & 0x00000FFF);
 }
 
 /** @brief Writes an analog value to either channel 1 or 2.

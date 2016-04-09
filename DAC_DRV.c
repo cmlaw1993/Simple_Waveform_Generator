@@ -49,7 +49,7 @@ void DAC_readDual(uint32_t *output1, uint32_t *output2)
  *
  *		DAC(output) = V(DDA) * DOR / 4095
  */
-int DAC_writeSingle(int chn, uint32_t data, DAC_RESOLUTION res)
+int DAC_writeSingle(int chn, uint32_t data, DAC_resolution_t res)
 {
 	if ((chn != 1) && (chn != 2))
 		return -1;
@@ -89,7 +89,7 @@ int DAC_writeSingle(int chn, uint32_t data, DAC_RESOLUTION res)
  *
  *		DAC(output) = V(DDA) * DOR / 4095
  */
-int DAC_writeDual(uint32_t data1, uint32_t data2, DAC_RESOLUTION res)
+int DAC_writeDual(uint32_t data1, uint32_t data2, DAC_resolution_t res)
 {
 	switch (res) {
 	case DAC_RESOLUTION_8:
@@ -161,7 +161,7 @@ void DAC_setSoftwareTriggerDual(void)
  *	@details Initializes either channel 1 or 2 in Single Mode with
  *	no triggerring.
  */
-int DAC_init(int chn, DAC_TRIGGER trig)
+int DAC_init(int chn, DAC_trigger_t trig)
 {
 	/* Check if channel index is correct */
 	if ((chn != 1) && (chn != 2))

@@ -21,6 +21,7 @@ typedef enum E_DAC_RESOLUTION {
 
 int DAC_read(int chn, uint32_t *output);
 int DAC_writeSingle(int chn, uint32_t data, DAC_RESOLUTION res);
+int DAC_writeDual(uint32_t data1, uint32_t data2, DAC_RESOLUTION res);
 int DAC_enable(int chn);
 int DAC_init(int chn);
 

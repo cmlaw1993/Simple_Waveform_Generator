@@ -66,6 +66,39 @@ int DAC_writeSingle(int chn, uint32_t data, DAC_RESOLUTION res)
 	return 0;
 }
 
+/** @brief Writes to both channel 1 and channel 2 of the DAC.
+ *	@param data1 The data to be written to channel 1.
+ *	@param data2 The data to be written to channle 2.
+ *	@param res The resolution of the data to be written.
+ *	@returns Returns 0 if successful and -1 if otherwise.
+ *
+ *	@details This function utilizes the right-aligned Dual Mode
+ *	registers, DHR8RD and DHR12RD. The resolution used is dependent
+ *	on the value of res. The output
+ *	voltage is calculated using the formula below.
+ *
+ *		DAC(output) = V(DDA) * DOR / 4095
+ */
+int DAC_writeDual(uint32_t data1, uint32_t data2, DAC_RESOLUTION res)
+{
+	switch (res) {
+	case DAC_RESOLUTION_8:
+		DAC->DHR8RD = (data1 & DAC_RESOLUTION_8_MASK) |
+						((data2 & DAC_RESOLUTION_8_MASK) << 8);
+		break;
+
+	case DAC_RESOLUTION_12:
+		DAC->DHR12RD = (data1 & DAC_RESOLUTION_12_MASK) |
+						((data2 & DAC_RESOLUTION_12_MASK) << 16);
+		break;
+
+	default:
+		return -1;
+	}
+
+	return 0;
+}
+
 /** @brief Enables the selected channel.
  *	@param chn The channel to enable. The value is either 1 or 2.
  *	@returns Returns 0 if successful and -1 if otherwise.

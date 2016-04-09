@@ -126,6 +126,34 @@ int DAC_enable(int chn)
 	return 0;
 }
 
+/**	@brief Sets the software trigger for the specified channel.
+ *	@param chn The desired channel to trigger. It can be either 0 or 1.
+ *
+ *	@note Software triggering has to be configured for the desired
+ *	channel during initialization.
+ */
+int DAC_setSoftwareTriggerSingle(int chn)
+{
+	if ((chn != 1) && (chn != 2))
+		return -1;
+
+	if (chn == 1)
+		DAC->SWTRIGR |= DAC_SWTRIGR_SWTRIG1;
+	else
+		DAC->SWTRIGR |= DAC_SWTRIGR_SWTRIG2;
+
+	return 0;
+}
+
+/** @brief Sets the software trigger for both DAC channels
+ *	@note Software triggering has to be configured for both channels
+ *	during initialization.
+ */
+void DAC_setSoftwareTriggerDual(void)
+{
+	DAC->SWTRIGR |= (DAC_SWTRIGR_SWTRIG1 | DAC_SWTRIGR_SWTRIG2);
+}
+
 /**	@brief Initializes DAC.
  *	@param chn The channel to initialize. The value is either 1 or 2.
  *	@returns Returns 0 if successful and -1 if otherwise.
@@ -133,7 +161,7 @@ int DAC_enable(int chn)
  *	@details Initializes either channel 1 or 2 in Single Mode with
  *	no triggerring.
  */
-int DAC_init(int chn)
+int DAC_init(int chn, DAC_TRIGGER trig)
 {
 	/* Check if channel index is correct */
 	if ((chn != 1) && (chn != 2))
@@ -145,15 +173,33 @@ int DAC_init(int chn)
 	if (chn == 1) {
 		GPIOA->MODER |= GPIO_MODER_MODER4; 		/* Set pin as AIN */
 		GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR4); 	/* Disable pull resistor */
+
+		switch (trig) {
+		case DAC_TRIGGER_NONE:
+			DAC->CR &= ~(DAC_CR_TEN1);
+			break;
+		case DAC_TRIGGER_SOFTWARE:
+			DAC->CR |= DAC_CR_TSEL1;
+			DAC->CR |= DAC_CR_TEN1;
+			break;
+		}
 		
-		DAC->CR &= ~(DAC_CR_TEN1); 	/* Disable triggering */
 		DAC->CR |= DAC_CR_BOFF1; 	/* Enable output buffer */
 	}
 	else if (chn == 2) {
 		GPIOA->MODER |= GPIO_MODER_MODER5; 		/* Set pin as AIN */
 		GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR5); 	/* Disable pull resistor */
+
+		switch (trig) {
+		case DAC_TRIGGER_NONE:
+			DAC->CR &= ~(DAC_CR_TEN2);
+			break;
+		case DAC_TRIGGER_SOFTWARE:
+			DAC->CR |= DAC_CR_TSEL2;
+			DAC->CR |= DAC_CR_TEN2;
+			break;
+		}
 		
-		DAC->CR &= ~(DAC_CR_TEN2); 	/* Disable triggering */
 		DAC->CR |= DAC_CR_BOFF2; 	/* Enable output buffer */
 	}
 	

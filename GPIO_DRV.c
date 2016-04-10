@@ -58,15 +58,15 @@ void GPIO_enableClock(GPIO_TypeDef *gpio)
 {
 	if (gpio == GPIOA)
 		RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-	else if ( gpio == GPIOB)
+	else if (gpio == GPIOB)
 		RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	else if ( gpio == GPIOC)
+	else if (gpio == GPIOC)
 		RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-	else if ( gpio == GPIOD)
+	else if (gpio == GPIOD)
 		RCC->AHBENR |= RCC_AHBENR_GPIODEN;
-	else if ( gpio == GPIOE)
+	else if (gpio == GPIOE)
 		RCC->AHBENR |= RCC_AHBENR_GPIOEEN;
-	else if ( gpio == GPIOF)
+	else if (gpio == GPIOF)
 		RCC->AHBENR |= RCC_AHBENR_GPIOFEN;
 }
 

@@ -7,6 +7,25 @@
  
 #include "GPIO_DRV.h"
 
+/** @brief Reads the input value of a GPIO pin.
+ *	@param gpio Base pointer to the GPIO to be read.
+ *	@param pinNum The pin number to the GPIO pin.
+ *	@returns 1 if the GPIO is logic high and 0 if otherwise.
+ */
+int GPIO_readPin(GPIO_TypeDef *gpio, int pinNum)
+{
+	return (int)((gpio->IDR >> pinNum) & 0x000000001);
+}
+
+/** @brief Reads the input values of a PORT.
+ *	@param gpio Base pointer to the GPIO to be read.
+ *	@param val Container for storing the output value.
+ */
+void GPIO_readPort(GPIO_TypeDef *gpio, uint16_t *val)
+{
+	*val = (uint16_t)((gpio->IDR) & 0x0000FFFF);
+}
+
 /** @brief Writes a digital value to a pin of a GPIO.
  *	@param gpio The base pointer to the GPIO of interest.
  *	@param pinNum The pin number of the GPIO pin of interest.
@@ -61,6 +80,7 @@ void GPIO_setDir(GPIO_TypeDef *gpio, int pinNum, GPIO_dir_t dir)
 {
 	switch (dir) {
 	case GPIO_DIR_INPUT:
+		gpio->MODER	&= ~((3ul << 2*pinNum));
 		break;
 	case GPIO_DIR_OUTPUT:
 		gpio->MODER	&= ~((3ul << 2*pinNum));

@@ -10,12 +10,20 @@
 
 #include "stm32f0xx.h"
 
+/** Enumeration for Timer Modes */
+typedef enum TIMER_mode_t {
+	TIMER_MODE_ONEPULSE,
+	TIMER_MODE_CONTINUOUS
+} TIMER_mode;
+
 /** Configuration parameters for setting up the timer. */
 struct TIMER_config {
 	uint16_t count;
 	uint16_t prescale;
+	TIMER_mode mode;
 };
 
+int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode mode);
 int TIMER_setCount(TIM_TypeDef *tim, int16_t val);
 int TIMER_setPrescaler(TIM_TypeDef *tim, int16_t val);
 int TIMER_disable(TIM_TypeDef *tim);

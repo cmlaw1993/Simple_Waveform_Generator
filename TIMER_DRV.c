@@ -15,6 +15,30 @@
 void (*TIMER6_callbackFunction)(void);
 void (*TIMER7_callbackFunction)(void);
 
+/** @brief Sets the mode for the timer
+ *	@param tim Base pointer of the timer to configure
+ *	@param mode Mode of the timer.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode mode)
+{
+	if ((tim != TIM6) && (tim != TIM7))
+		return -1;
+
+	switch (mode) {
+	case TIMER_MODE_ONEPULSE:
+		tim->CR1 |= TIM_CR1_OPM;
+		break;
+	case TIMER_MODE_CONTINUOUS:
+		tim->CR1 &= ~(TIM_CR1_OPM);
+		break;
+	default:
+		return -1;
+	}
+
+	return 0;
+}
+
 /** @brief Sets the auto reload register of a basic timer.
  *	@param tim Base pointer to the timer to be configured. The value
  *	for this argument can either be TIM6 or TIM7.
@@ -110,6 +134,8 @@ int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,
 
 	tim->CR1 |= TIM_CR1_ARPE; /* ARR register is buffered */
 
+	TIMER_setMode(tim, conf.mode);
+	
 	TIMER_setCount(tim, conf.count);
 	TIMER_setPrescaler(tim, conf.prescale);
 

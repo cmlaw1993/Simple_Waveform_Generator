@@ -11,10 +11,10 @@
 #include "stm32f0xx.h"
 
 /** Enumeration for Timer Modes */
-typedef enum TIMER_mode_t {
+typedef enum TIMER_mode {
 	TIMER_MODE_ONEPULSE,
 	TIMER_MODE_CONTINUOUS
-} TIMER_mode;
+} TIMER_mode_t;
 
 typedef enum TIMER_masterMode {
 	TIMER_MASTERMODE_RESET,
@@ -26,11 +26,12 @@ typedef enum TIMER_masterMode {
 struct TIMER_config {
 	uint16_t count;
 	uint16_t prescale;
-	TIMER_mode mode;
+	TIMER_mode_t mode;
 	TIMER_masterMode_t mmode;
 };
 
-int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode mode);
+
+int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode_t mode);
 int TIMER_setMasterMode(TIM_TypeDef *tim, TIMER_masterMode_t mmode);
 int TIMER_setCount(TIM_TypeDef *tim, int16_t val);
 int TIMER_setPrescaler(TIM_TypeDef *tim, int16_t val);

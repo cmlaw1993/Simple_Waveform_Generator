@@ -20,7 +20,7 @@ void (*TIMER7_callbackFunction)(void);
  *	@param mode Mode of the timer.
  *	@returns 0 if successful and -1 if otherwise.
  */
-int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode mode)
+int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode_t mode)
 {
 	if ((tim != TIM6) && (tim != TIM7))
 		return -1;

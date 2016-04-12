@@ -15,6 +15,35 @@
 void (*TIMER6_callbackFunction)(void);
 void (*TIMER7_callbackFunction)(void);
 
+
+/** @brief Disable the counting of a basic timer.
+ *	@param tim Base pointer to the timer to be configured. The value
+ *	for this argument can either be TIM6 or TIM7.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int TIMER_disable(TIM_TypeDef *tim)
+{
+	if ((tim != TIM6) && (tim != TIM7))
+		return -1;
+
+	tim->CR1 &= ~(TIM_CR1_CEN);
+	return 0;
+}
+
+/** @brief Enables the counting of a basic timer.
+ *	@param tim Base pointer to the timer to be configured. The value
+ *	for this argument can either be TIM6 or TIM7.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int TIMER_enable(TIM_TypeDef *tim)
+{
+	if ((tim != TIM6) && (tim != TIM7))
+		return -1;
+
+	tim->CR1 |= TIM_CR1_CEN;
+	return 0;
+}
+
 /** @brief Sets the mode for the timer
  *	@param tim Base pointer of the timer to configure
  *	@param mode Mode of the timer.
@@ -96,34 +125,6 @@ int TIMER_setPrescaler(TIM_TypeDef *tim, int16_t val)
 		return -1;
 
 	tim->PSC = val;
-	return 0;
-}
-
-/** @brief Disable the counting of a basic timer.
- *	@param tim Base pointer to the timer to be configured. The value
- *	for this argument can either be TIM6 or TIM7.
- *	@returns 0 if successful and -1 if otherwise.
- */
-int TIMER_disable(TIM_TypeDef *tim)
-{
-	if ((tim != TIM6) && (tim != TIM7))
-		return -1;
-
-	tim->CR1 &= ~(TIM_CR1_CEN);
-	return 0;
-}
-
-/** @brief Enables the counting of a basic timer.
- *	@param tim Base pointer to the timer to be configured. The value
- *	for this argument can either be TIM6 or TIM7.
- *	@returns 0 if successful and -1 if otherwise.
- */
-int TIMER_enable(TIM_TypeDef *tim)
-{
-	if ((tim != TIM6) && (tim != TIM7))
-		return -1;
-
-	tim->CR1 |= TIM_CR1_CEN;
 	return 0;
 }
 

@@ -30,13 +30,13 @@ struct TIMER_config {
 	TIMER_masterMode_t mmode;
 };
 
+int TIMER_disable(TIM_TypeDef *tim);
+int TIMER_enable(TIM_TypeDef *tim);
 
 int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode_t mode);
 int TIMER_setMasterMode(TIM_TypeDef *tim, TIMER_masterMode_t mmode);
 int TIMER_setCount(TIM_TypeDef *tim, int16_t val);
 int TIMER_setPrescaler(TIM_TypeDef *tim, int16_t val);
-int TIMER_disable(TIM_TypeDef *tim);
-int TIMER_enable(TIM_TypeDef *tim);
 int TIMER_enableClock(TIM_TypeDef *tim);
 
 int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,

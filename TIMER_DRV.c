@@ -39,6 +39,36 @@ int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode mode)
 	return 0;
 }
 
+/** @brief Sets the master mode for a basic timer.
+ *	@param tim Base pointer for the timer to configure. The value for this
+ *	parameter can be TIM6 or TIM7.
+ *	@param mmode The master mode to be configured for the timer.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int TIMER_setMasterMode(TIM_TypeDef *tim, TIMER_masterMode_t mmode)
+{
+	if ((tim != TIM6) && (tim != TIM7))
+		return -1;
+	
+	switch (mmode) {
+	case TIMER_MASTERMODE_RESET:
+		tim->CR2 &= ~(TIM_CR2_MMS);
+		break;
+	case TIMER_MASTERMODE_ENABLE:
+		tim->CR2 &= ~(TIM_CR2_MMS);
+		tim->CR2 |= TIM_CR2_MMS_0;
+		break;
+	case TIMER_MASTERMODE_UPDATE:
+		tim->CR2 &= ~(TIM_CR2_MMS);
+		tim->CR2 |= TIM_CR2_MMS_1;
+		break;
+	default:
+		return -1;
+	}
+	
+	return 0;
+}
+
 /** @brief Sets the auto reload register of a basic timer.
  *	@param tim Base pointer to the timer to be configured. The value
  *	for this argument can either be TIM6 or TIM7.
@@ -135,6 +165,7 @@ int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,
 	tim->CR1 |= TIM_CR1_ARPE; /* ARR register is buffered */
 
 	TIMER_setMode(tim, conf.mode);
+	TIMER_setMasterMode(tim, conf.mmode);
 	
 	TIMER_setCount(tim, conf.count);
 	TIMER_setPrescaler(tim, conf.prescale);

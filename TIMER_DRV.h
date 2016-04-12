@@ -22,14 +22,25 @@ typedef enum TIMER_masterMode {
 	TIMER_MASTERMODE_UPDATE
 } TIMER_masterMode_t;
 
+/** Enumeration for configurign UG Interrupt
+ *	@note If set to enable, setting an event will cause
+ *	an interrupt to trigger.
+ */
+typedef enum TIMER_UGInterrupt {
+	TIMER_UGINTERRUPT_ENABLE,
+	TIMER_UGINTERRUPT_DISABLE
+} TIMER_UGInterrupt_t;
+
 /** Configuration parameters for setting up the timer. */
 struct TIMER_config {
 	uint16_t count;
 	uint16_t prescale;
 	TIMER_mode_t mode;
 	TIMER_masterMode_t mmode;
+	TIMER_UGInterrupt_t UGInt;
 };
 
+int TIMER_generateEvent(TIM_TypeDef *tim);
 int TIMER_disable(TIM_TypeDef *tim);
 int TIMER_enable(TIM_TypeDef *tim);
 
@@ -37,6 +48,7 @@ int TIMER_setMode(TIM_TypeDef *tim, TIMER_mode_t mode);
 int TIMER_setMasterMode(TIM_TypeDef *tim, TIMER_masterMode_t mmode);
 int TIMER_setCount(TIM_TypeDef *tim, int16_t val);
 int TIMER_setPrescaler(TIM_TypeDef *tim, int16_t val);
+int TIMER_setUGInterrupt(TIM_TypeDef *tim, TIMER_UGInterrupt_t UGInt);
 int TIMER_enableClock(TIM_TypeDef *tim);
 
 int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,

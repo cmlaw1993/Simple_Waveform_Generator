@@ -15,6 +15,20 @@
 void (*TIMER6_callbackFunction)(void);
 void (*TIMER7_callbackFunction)(void);
 
+/** @brief Generates an event for the selected timer.
+ *	@param tim Base pointer for the selected timer. The value for
+ *	this parameter can be either TIM6 or TIM7.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int TIMER_generateEvent(TIM_TypeDef *tim)
+{
+	if ((tim != TIM6) && (tim != TIM7))
+		return -1;
+	
+	tim->EGR |= TIM_EGR_UG;
+	
+	return 0;
+}
 
 /** @brief Disable the counting of a basic timer.
  *	@param tim Base pointer to the timer to be configured. The value
@@ -128,6 +142,31 @@ int TIMER_setPrescaler(TIM_TypeDef *tim, int16_t val)
 	return 0;
 }
 
+/** @brief Configures the UG interrupt for a basic timer.
+ *	@param tim Base pointer for the basic timer to configure. The value
+ *	for this argument can be either TIM6 or TIM7.
+ *	@param UGInt The UGInt configuration for the timer.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int TIMER_setUGInterrupt(TIM_TypeDef *tim, TIMER_UGInterrupt_t UGInt)
+{
+	if ((tim != TIM6) && (tim != TIM7))
+		return -1;
+
+	switch (UGInt) {
+	case TIMER_UGINTERRUPT_DISABLE:
+		tim->CR1 |= TIM_CR1_URS;
+		break;
+	case TIMER_UGINTERRUPT_ENABLE:
+		tim->CR1 &= ~(TIM_CR1_URS);
+		break;
+	default:
+		return -1;
+	}
+	
+	return 0;
+}
+
 /** @brief Enables the clock for a basic timer peripheral.
  *	@param tim Base pointer to the timer to be configured. The value
  *	for this argument can either be TIM6 or TIM7.
@@ -170,7 +209,8 @@ int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,
 	
 	TIMER_setCount(tim, conf.count);
 	TIMER_setPrescaler(tim, conf.prescale);
-
+	TIMER_setUGInterrupt(tim, conf.UGInt);
+	
 	tim->SR &= ~(TIM_SR_UIF); /* Clear interrupt flag */
 	tim->DIER |= TIM_DIER_UIE; /* Enable interrupt */
 

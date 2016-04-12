@@ -109,6 +109,23 @@ int DAC_writeDual(uint32_t data1, uint32_t data2, DAC_resolution_t res)
 	return 0;
 }
 
+/** @brief Disables the selected channel.
+ *	@param chn The channe to disable. This value is either 1 or 2.
+ *	@returns 0 if successful and -1 if otherwise.
+ */
+int DAC_disable(int chn)
+{
+	if ((chn != 1) && (chn != 2))
+		return -1;
+	
+	if (chn == 1)
+		DAC->CR &= ~(DAC_CR_EN1);
+	else
+		DAC->CR &= ~(DAC_CR_EN2);
+	
+	return 0;
+}
+
 /** @brief Enables the selected channel.
  *	@param chn The channel to enable. The value is either 1 or 2.
  *	@returns Returns 0 if successful and -1 if otherwise.

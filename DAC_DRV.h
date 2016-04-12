@@ -27,6 +27,7 @@ typedef enum DAC_trigger {
 	DAC_TRIGGER_TIMER7
 } DAC_trigger_t;
 
+
 int DAC_readSingle(int chn, uint32_t *output);
 void DAC_readDual(uint32_t *output1, uint32_t *output2);
 int DAC_writeSingle(int chn, uint32_t data, DAC_resolution_t res);
@@ -35,9 +36,10 @@ int DAC_writeDual(uint32_t data1, uint32_t data2, DAC_resolution_t res);
 int DAC_setSoftwareTriggerSingle(int chn);
 void DAC_setSoftwareTriggerDual(void);
 
-int DAC_configTrigger(int chn, DAC_trigger_t trig);
-
+int DAC_disable(int chn);
 int DAC_enable(int chn);
+
+int DAC_configTrigger(int chn, DAC_trigger_t trig);
 
 int DAC_init(int chn, DAC_trigger_t trig);
 

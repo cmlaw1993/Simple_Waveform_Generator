@@ -154,6 +154,65 @@ void DAC_setSoftwareTriggerDual(void)
 	DAC->SWTRIGR |= (DAC_SWTRIGR_SWTRIG1 | DAC_SWTRIGR_SWTRIG2);
 }
 
+
+/** @brief Initializes triggering for a DAC channel.
+ *	@param chn The channel to configure. The value for this argument
+ *	can either be 1 or 2.
+ *	@param trig The type trigger to configure for the channel.
+ * 	@returns 0 if successful and -1 if otherwise.
+ */
+int DAC_configTrigger(int chn, DAC_trigger_t trig)
+{
+	if ((chn != 1) && (chn != 2))
+		return -1;
+
+	if (chn == 1) {
+		switch (trig) {
+		case DAC_TRIGGER_NONE:
+			DAC->CR &= ~(DAC_CR_TEN1);
+			break;
+		case DAC_TRIGGER_SOFTWARE:
+			DAC->CR |= DAC_CR_TSEL1;
+			DAC->CR |= DAC_CR_TEN1;
+			break;
+		case DAC_TRIGGER_TIMER6:
+			DAC->CR &= ~(DAC_CR_TSEL1);
+			DAC->CR |= DAC_CR_TEN1;
+			break;
+		case DAC_TRIGGER_TIMER7:
+			DAC->CR &= ~(DAC_CR_TSEL1);
+			DAC->CR |= DAC_CR_TSEL1_1;
+			DAC->CR |= DAC_CR_TEN1;
+			break;
+		default:
+			break;
+		}
+	} else if (chn == 2) {
+		switch (trig) {
+		case DAC_TRIGGER_NONE:
+			DAC->CR &= ~(DAC_CR_TEN2);
+			break;
+		case DAC_TRIGGER_SOFTWARE:
+			DAC->CR |= DAC_CR_TSEL2;
+			DAC->CR |= DAC_CR_TEN2;
+			break;
+		case DAC_TRIGGER_TIMER6:
+			DAC->CR &= ~(DAC_CR_TSEL2);
+			DAC->CR |= DAC_CR_TEN2;
+			break;
+		case DAC_TRIGGER_TIMER7:
+			DAC->CR &= ~(DAC_CR_TSEL2);
+			DAC->CR |= DAC_CR_TSEL2_1;
+			DAC->CR |= DAC_CR_TEN2;
+			break;
+		default:
+			break;	
+		}
+	}
+
+	return 0;
+}
+
 /**	@brief Initializes DAC.
  *	@param chn The channel to initialize. The value is either 1 or 2.
  *	@returns Returns 0 if successful and -1 if otherwise.
@@ -166,40 +225,20 @@ int DAC_init(int chn, DAC_trigger_t trig)
 	/* Check if channel index is correct */
 	if ((chn != 1) && (chn != 2))
 		return -1;
-	
+
 	/* Enable clock for DAC peripheral */
 	RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+	
+	DAC_configTrigger(chn, trig);
 	
 	if (chn == 1) {
 		GPIOA->MODER |= GPIO_MODER_MODER4; 		/* Set pin as AIN */
 		GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR4); 	/* Disable pull resistor */
-
-		switch (trig) {
-		case DAC_TRIGGER_NONE:
-			DAC->CR &= ~(DAC_CR_TEN1);
-			break;
-		case DAC_TRIGGER_SOFTWARE:
-			DAC->CR |= DAC_CR_TSEL1;
-			DAC->CR |= DAC_CR_TEN1;
-			break;
-		}
-		
 		DAC->CR |= DAC_CR_BOFF1; 	/* Enable output buffer */
 	}
 	else if (chn == 2) {
 		GPIOA->MODER |= GPIO_MODER_MODER5; 		/* Set pin as AIN */
 		GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR5); 	/* Disable pull resistor */
-
-		switch (trig) {
-		case DAC_TRIGGER_NONE:
-			DAC->CR &= ~(DAC_CR_TEN2);
-			break;
-		case DAC_TRIGGER_SOFTWARE:
-			DAC->CR |= DAC_CR_TSEL2;
-			DAC->CR |= DAC_CR_TEN2;
-			break;
-		}
-		
 		DAC->CR |= DAC_CR_BOFF2; 	/* Enable output buffer */
 	}
 	

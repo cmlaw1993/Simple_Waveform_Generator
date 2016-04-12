@@ -16,6 +16,7 @@ typedef enum TIMER_mode {
 	TIMER_MODE_CONTINUOUS
 } TIMER_mode_t;
 
+/** Enumeration for Master Mode */
 typedef enum TIMER_masterMode {
 	TIMER_MASTERMODE_RESET,
 	TIMER_MASTERMODE_ENABLE,

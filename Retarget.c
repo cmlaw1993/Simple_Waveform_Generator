@@ -17,10 +17,6 @@
 #include <rt_misc.h>
 #include "Serial.h"
 
-#pragma import(__use_no_semihosting_swi)
-
-
-
 struct __FILE { int handle; /* Add whatever you need here */ };
 FILE __stdout;
 FILE __stdin;

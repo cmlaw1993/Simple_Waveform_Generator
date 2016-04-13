@@ -16,6 +16,7 @@
 
 #include "stm32f0xx.h"                  // Device header
 #include "Serial.h"
+#include <stdio.h>
 
 /*----------------------------------------------------------------------------
  Define  USART
@@ -31,6 +32,76 @@
 #define __DIVFRAQ(__PCLK, __BAUD)   (((__DIV(__PCLK, __BAUD) - (__DIVMANT(__PCLK, __BAUD) * 100)) * 16 + 50) / 100)
 #define __USART_BRR(__PCLK, __BAUD) ((__DIVMANT(__PCLK, __BAUD) << 4)|(__DIVFRAQ(__PCLK, __BAUD) & 0x0F))
 
+/** Ring buffer size */
+#define SER_RBUF_SIZE	50
+
+/** The structure for a ring buffer */
+struct SER_ringBuf {
+	unsigned char buffer[SER_RBUF_SIZE];
+	volatile int head;
+	volatile int tail;
+};
+
+/** @name Intermediary ring buffers for sending and receiving data. */
+/** @{*/
+
+static struct SER_ringBuf rx_rbuf; 
+static struct SER_ringBuf tx_rbuf;
+
+/** @}*/
+
+/** @brief Reads a single byte from the rx ring buffer.
+ *	@param output The container for holding the output read.
+ *	@returns 0 if successful and -1 if there is nothing to read.
+ */
+static int rx_rbuf_read(unsigned char *output)
+{
+	if (rx_rbuf.head == rx_rbuf.tail)
+		return -1;
+	
+	*output = rx_rbuf.buffer[rx_rbuf.tail];
+	rx_rbuf.tail = (unsigned int)((rx_rbuf.tail + 1) % SER_RBUF_SIZE);
+	
+	return 0;
+}
+
+/** @brief Writes a single byte into the rx ring buffer.
+ *	@param input The char to be written to the buffer.
+ */
+static void rx_rbuf_write(unsigned char input)
+{
+	int i = (rx_rbuf.head + 1) % SER_RBUF_SIZE;
+    
+	rx_rbuf.buffer[rx_rbuf.head] = input;
+	rx_rbuf.head = i;
+}
+
+/** @brief Reads a single byte from the tx ring buffer.
+ *	@param output The container to store the read character.
+ *	@returns 0 if successful and -1 if there is no character
+ *	to be read.
+ */
+static int tx_rbuf_read(unsigned char *output)
+{
+	if (tx_rbuf.head == tx_rbuf.tail)
+		return -1;
+		
+	*output = tx_rbuf.buffer[tx_rbuf.tail];
+	tx_rbuf.tail = (unsigned int)((tx_rbuf.tail + 1) % SER_RBUF_SIZE);
+
+	return 0;
+}
+
+/**	@brief Writes a single character to the tx ring buffer.
+ *	@param input The character to be written to the tx ring buffer.
+ */
+static void tx_rbuf_write(unsigned char input)
+{
+	int i = (tx_rbuf.head + 1) % SER_RBUF_SIZE;
+	
+    tx_rbuf.buffer[tx_rbuf.head] = input;
+	tx_rbuf.head = i;
+}
 
 /*----------------------------------------------------------------------------
   Initialize UART pins, Baudrate
@@ -46,34 +117,66 @@ void SER_Initialize (void) {
   GPIOA->MODER  &= ~(( 3ul << 2* 2) | ( 3ul << 2* 3));
   GPIOA->MODER  |=  (( 2ul << 2* 2) | ( 2ul << 2* 3));
 
+  NVIC_EnableIRQ(USART2_IRQn);
+
   USARTx->BRR  = __USART_BRR(48000000ul, 115200ul);  /* 115200 baud @ 48MHz   */
   USARTx->CR3   = 0x0000;                  /* no flow control                 */
   USARTx->CR2   = 0x0000;                  /* 1 stop bit                      */
   USARTx->CR1   = ((   1ul <<  2) |        /* enable RX                       */
                    (   1ul <<  3) |        /* enable TX                       */
                    (   0ul << 12) |        /* 1 start bit, 8 data bits        */
-                   (   1ul <<  0) );       /* enable USART                    */
+                   (   1ul <<  0) |       /* enable USART                    */
+					USART_CR1_RXNEIE );		/* Enable receive interrupt */
 }
 
 
 /*----------------------------------------------------------------------------
   Write character to Serial Port
  *----------------------------------------------------------------------------*/
-int SER_PutChar (int ch) {
-
-  while (!(USARTx->ISR & (1ul << 7)));
-  USARTx->TDR = (ch & 0x1FF);
-
-  return (ch);
+unsigned char SER_PutChar (unsigned char ch)
+{
+	tx_rbuf_write(ch);
+	USARTx->CR1 |= USART_CR1_TXEIE;
+	return ch;
 }
 
 /*----------------------------------------------------------------------------
   Read character from Serial Port
  *----------------------------------------------------------------------------*/
-int SER_GetChar (void) {
+unsigned char SER_GetChar (void)
+{
+	unsigned char input;
 
-  if (USARTx->ISR & 0x0020)
-    return (USARTx->RDR);
+	while(rx_rbuf_read(&input));
+	return input;
+}
 
-  return (-1);
+/** @brief Function for handling rx interrupts.
+ */
+static void SER_handleRxInterrupt(void)
+{
+	rx_rbuf_write((unsigned char)(USARTx->RDR & 0xFF));
+}
+
+/** @brief Function for handling tx interrupts .
+ */
+static void SER_handleTxInterrupt(void)
+{
+	unsigned char output;
+	
+	if (!tx_rbuf_read(&output)) {
+		USARTx->TDR = (output & 0xFF);
+	} else {
+		USARTx->CR1 &= ~(USART_CR1_TXEIE);
+	}
+}
+
+/** @brief IRQ Handler function for USART2 */
+void USART2_IRQHandler(void)
+{
+	if (USARTx->ISR & USART_ISR_RXNE)
+		SER_handleRxInterrupt();
+	
+	if (USARTx->ISR & USART_ISR_TXE)
+		SER_handleTxInterrupt();
 }

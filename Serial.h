@@ -17,7 +17,7 @@
 #define SERIAL_H
 
 extern void SER_Initialize(void);
-extern int  SER_GetChar   (void);
-extern int  SER_PutChar   (int c);
+extern unsigned char SER_GetChar (void);
+extern unsigned char SER_PutChar(unsigned char ch);
 
 #endif

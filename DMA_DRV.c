@@ -77,7 +77,7 @@ int DMA_init(int chn, struct DMA_config conf)
 	if (DMA_extractBasePointer(chn, &dma))
 		return -1;
 
-	RCC->AHBENR |=RCC_AHBENR_DMA1EN; /* Enable clock for DMA */
+	RCC->AHBENR |= RCC_AHBENR_DMA1EN; /* Enable clock for DMA */
 	
 	dma->CMAR = (uint32_t)(conf.readMem);
 	dma->CPAR = (uint32_t)(conf.writeMem);

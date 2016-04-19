@@ -10,6 +10,7 @@
  
 #include "stm32f0xx.h"
 
+/** Configuration structure for DMA setting up DMA */
 struct DMA_config {
 	int numWrite;
 	uint32_t *readMem;

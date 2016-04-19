@@ -12,8 +12,8 @@
 #include "TIMER_DRV.h"
 
 /** Pointers to callback functions */
-void (*TIMER6_callbackFunction)(void);
-void (*TIMER7_callbackFunction)(void);
+void (*TIMER6_callbackFunction)(void) = NULL;
+void (*TIMER7_callbackFunction)(void) = NULL;
 
 /** @brief Generates an event for the selected timer.
  *	@param tim Base pointer for the selected timer. The value for
@@ -196,10 +196,7 @@ int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,
 {
 	if ((tim != TIM6) & (tim != TIM7))
 		return -1;
-
-	if(!callback)
-		return -1;
-
+	
 	TIMER_enableClock(tim);
 
 	tim->CR1 |= TIM_CR1_ARPE; /* ARR register is buffered */
@@ -211,15 +208,21 @@ int TIMER_init(TIM_TypeDef *tim, struct TIMER_config conf,
 	TIMER_setPrescaler(tim, conf.prescale);
 	TIMER_setUGInterrupt(tim, conf.UGInt);
 	
+	tim->DIER |= TIM_DIER_UDE;
+	
 	tim->SR &= ~(TIM_SR_UIF); /* Clear interrupt flag */
 	tim->DIER |= TIM_DIER_UIE; /* Enable interrupt */
 
-	if (tim == TIM6) {
-		NVIC_EnableIRQ(TIM6_DAC_IRQn);
-		TIMER6_callbackFunction = callback;
-	} else {
-		NVIC_EnableIRQ(TIM7_IRQn);
-		TIMER7_callbackFunction = callback;
+	if ((tim == TIM6) && (conf.intEnable)) {
+		if (callback != NULL) {
+			NVIC_EnableIRQ(TIM6_DAC_IRQn);
+			TIMER6_callbackFunction = callback;
+		}
+	} else if ((tim == TIM7) && (conf.intEnable)) {
+		if (callback != NULL) {
+			NVIC_EnableIRQ(TIM7_IRQn);
+			TIMER7_callbackFunction = callback;	
+		}		
 	}
 
 	return 0;

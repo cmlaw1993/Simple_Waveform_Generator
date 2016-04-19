@@ -8,6 +8,8 @@
 #ifndef TIMER_DRV_H
 #define TIMER_DRV_H
 
+#include <stdio.h>
+#include <stdbool.h>
 #include "stm32f0xx.h"
 
 /** Enumeration for Timer Modes */
@@ -39,6 +41,7 @@ struct TIMER_config {
 	TIMER_mode_t mode;
 	TIMER_masterMode_t mmode;
 	TIMER_UGInterrupt_t UGInt;
+	bool intEnable;
 };
 
 int TIMER_generateEvent(TIM_TypeDef *tim);

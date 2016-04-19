@@ -33,6 +33,7 @@ typedef enum DAC_dma {
 	DAC_DMA_ENABLE,
 } DAC_dma_t;
 
+/** Config structure for DAC */
 struct DAC_config {
 	DAC_trigger_t trig;
 	DAC_dma_t dma;

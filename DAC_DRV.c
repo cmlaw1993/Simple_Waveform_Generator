@@ -268,10 +268,10 @@ int DAC_configDMA(int chn, DAC_dma_t dma)
 
 /**	@brief Initializes DAC.
  *	@param chn The channel to initialize. The value is either 1 or 2.
+ *	@param conf Config structure for configuring the DAC.
  *	@returns Returns 0 if successful and -1 if otherwise.
  *
- *	@details Initializes either channel 1 or 2 in Single Mode with
- *	no triggerring.
+ *	@details Initializes either channel 1 or 2 of the DAC.
  */
 int DAC_init(int chn, struct DAC_config conf)
 {

@@ -273,7 +273,7 @@ int DAC_configDMA(int chn, DAC_dma_t dma)
  *	@details Initializes either channel 1 or 2 in Single Mode with
  *	no triggerring.
  */
-int DAC_init(int chn, DAC_trigger_t trig, DAC_dma_t dma)
+int DAC_init(int chn, struct DAC_config conf)
 {
 	/* Check if channel index is correct */
 	if ((chn != 1) && (chn != 2))
@@ -282,8 +282,8 @@ int DAC_init(int chn, DAC_trigger_t trig, DAC_dma_t dma)
 	/* Enable clock for DAC peripheral */
 	RCC->APB1ENR |= RCC_APB1ENR_DACEN;
 	
-	DAC_configTrigger(chn, trig);
-	DAC_configDMA(chn, dma);
+	DAC_configTrigger(chn, conf.trig);
+	DAC_configDMA(chn, conf.dma);
 	
 	if (chn == 1) {
 		GPIOA->MODER |= GPIO_MODER_MODER4; 		/* Set pin as AIN */

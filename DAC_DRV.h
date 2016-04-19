@@ -33,6 +33,11 @@ typedef enum DAC_dma {
 	DAC_DMA_ENABLE,
 } DAC_dma_t;
 
+struct DAC_config {
+	DAC_trigger_t trig;
+	DAC_dma_t dma;
+};
+
 int DAC_readSingle(int chn, uint32_t *output);
 void DAC_readDual(uint32_t *output1, uint32_t *output2);
 int DAC_writeSingle(int chn, uint32_t data, DAC_resolution_t res);
@@ -47,6 +52,6 @@ int DAC_enable(int chn);
 int DAC_configTrigger(int chn, DAC_trigger_t trig);
 int DAC_configDMA(int chn, DAC_dma_t dma);
 
-int DAC_init(int chn, DAC_trigger_t trig, DAC_dma_t dma);
+int DAC_init(int chn, struct DAC_config conf);
 
 #endif /* DAC_DRV_H */

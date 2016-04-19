@@ -171,7 +171,6 @@ void DAC_setSoftwareTriggerDual(void)
 	DAC->SWTRIGR |= (DAC_SWTRIGR_SWTRIG1 | DAC_SWTRIGR_SWTRIG2);
 }
 
-
 /** @brief Initializes triggering for a DAC channel.
  *	@param chn The channel to configure. The value for this argument
  *	can either be 1 or 2.
@@ -230,6 +229,43 @@ int DAC_configTrigger(int chn, DAC_trigger_t trig)
 	return 0;
 }
 
+/**	@brief Enables or disables the DMA.
+ *	@param chn The channel to configure.
+ *	@dma The setting to either enable or disable the DMA.
+ */
+int DAC_configDMA(int chn, DAC_dma_t dma)
+{
+	/* Check if channel index is correct */
+	if ((chn != 1) && (chn != 2))
+		return -1;
+	
+	if (chn == 1) {
+		switch (dma) {
+		case DAC_DMA_DISABLE:
+			DAC->CR &= ~(DAC_CR_DMAEN1);
+			break;
+		case DAC_DMA_ENABLE:
+			DAC->CR |= DAC_CR_DMAEN1;
+			break;
+		default:
+			return -1;
+		}
+	} else {
+		switch (dma) {
+		case DAC_DMA_DISABLE:
+			DAC->CR &= ~(DAC_CR_DMAEN2);
+			break;
+		case DAC_DMA_ENABLE:
+			DAC->CR |= DAC_CR_DMAEN2;
+			break;
+		default:
+			return -1;
+		}
+	}
+	
+	return 0;
+}
+
 /**	@brief Initializes DAC.
  *	@param chn The channel to initialize. The value is either 1 or 2.
  *	@returns Returns 0 if successful and -1 if otherwise.
@@ -237,7 +273,7 @@ int DAC_configTrigger(int chn, DAC_trigger_t trig)
  *	@details Initializes either channel 1 or 2 in Single Mode with
  *	no triggerring.
  */
-int DAC_init(int chn, DAC_trigger_t trig)
+int DAC_init(int chn, DAC_trigger_t trig, DAC_dma_t dma)
 {
 	/* Check if channel index is correct */
 	if ((chn != 1) && (chn != 2))
@@ -247,6 +283,7 @@ int DAC_init(int chn, DAC_trigger_t trig)
 	RCC->APB1ENR |= RCC_APB1ENR_DACEN;
 	
 	DAC_configTrigger(chn, trig);
+	DAC_configDMA(chn, dma);
 	
 	if (chn == 1) {
 		GPIOA->MODER |= GPIO_MODER_MODER4; 		/* Set pin as AIN */

@@ -27,6 +27,11 @@ typedef enum DAC_trigger {
 	DAC_TRIGGER_TIMER7
 } DAC_trigger_t;
 
+/** Enumeration for DMA enable setting */
+typedef enum DAC_dma {
+	DAC_DMA_DISABLE,
+	DAC_DMA_ENABLE,
+} DAC_dma_t;
 
 int DAC_readSingle(int chn, uint32_t *output);
 void DAC_readDual(uint32_t *output1, uint32_t *output2);
@@ -40,7 +45,8 @@ int DAC_disable(int chn);
 int DAC_enable(int chn);
 
 int DAC_configTrigger(int chn, DAC_trigger_t trig);
+int DAC_configDMA(int chn, DAC_dma_t dma);
 
-int DAC_init(int chn, DAC_trigger_t trig);
+int DAC_init(int chn, DAC_trigger_t trig, DAC_dma_t dma);
 
 #endif /* DAC_DRV_H */
